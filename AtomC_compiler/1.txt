@@ -10,5 +10,4 @@ int main()
 	putc('#');
 	puts("");	// pentru \n
 	return 0;
-//
 }
