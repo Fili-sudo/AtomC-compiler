@@ -571,6 +571,7 @@ bool consume(int code){
 }
 
 bool unit(){
+    Token *start=iTk;
     for(;;){
         if(structDef()){}
         else if(fnDef()){}
@@ -580,6 +581,7 @@ bool unit(){
     if(consume(END)){
         return true;
     }
+    iTk = start;
     return false;
 }
 bool structDef(){
@@ -619,7 +621,11 @@ bool fnDef(){
             if(consume(LPAR)){
                 if(fnParam()){
                     while(consume(COMMA)){
-                        if(expr()){
+                        if(fnParam()){
+                        }
+                        else{
+                          iTk = start;
+                          return false;
                         }
                     }
                 }
@@ -656,7 +662,7 @@ bool typeBase(){
 bool arrayDecl(){
     Token *start=iTk;
     if(consume(LBRACKET)){
-        if(expr()){}
+        if(consume(CT_INT)){}
         if(consume(RBRACKET)){
             return true;
         }
@@ -1004,6 +1010,7 @@ bool exprPrimary(){
             iTk=start;
             return false;
         }
+        return true;
     }
     iTk=start;
     if(consume(CT_INT)){
@@ -1033,7 +1040,7 @@ int main()
 {
     FILE *fis;
 
-    fis=fopen("1.txt", "rb");
+    fis=fopen("2.txt", "rb");
     if(fis==NULL){
         printf("nu s-a putut deschide fisierul");
         return -1;
@@ -1046,6 +1053,10 @@ int main()
     pCrtCh=buffin;
     while(getNextToken()!=END){
         }
+    //showAtoms();
+    iTk = tokens;
+    bool start = unit();
+    printf("%d\n", start);
     showAtoms();
     return 0;
 }

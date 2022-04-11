@@ -35,6 +35,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="1.txt" />
+		<Unit filename="2.txt" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
