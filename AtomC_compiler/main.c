@@ -56,6 +56,15 @@ char *createString(const char *pStartCh, char *pCrtCh){
     return value;
 }
 
+void EliberareMemorie(){
+    Token *p;
+    while(tokens!=NULL){
+        p=tokens;
+        tokens=tokens->next;
+        free(p);
+    }
+}
+
 void err(const char *fmt,...)
 {
     va_list va;
@@ -64,6 +73,7 @@ void err(const char *fmt,...)
     vfprintf(stderr,fmt,va);
     fputc('\n',stderr);
     va_end(va);
+    EliberareMemorie();
     exit(-1);
 }
 
@@ -75,6 +85,7 @@ void tkerr(const Token *tk,const char *fmt,...)
     vfprintf(stderr,fmt,va);
     fputc('\n',stderr);
     va_end(va);
+    EliberareMemorie();
     exit(-1);
 }
 
@@ -594,9 +605,12 @@ bool structDef(){
                     if(consume(SEMICOLON)){
                         return true;
                     }
+                    else tkerr(iTk, "missing ;");
                 }
+                else tkerr(iTk, "missing } after last struct field");
             }
         }
+        else tkerr(iTk, "missing identifier after struct");
     }
     iTk = start;
     return false;
@@ -609,7 +623,10 @@ bool varDef(){
             if(consume(SEMICOLON)){
                 return true;
             }
+            else tkerr(iTk, "missing ;");
+
         }
+        else tkerr(iTk, "missing identifier after type declaration");
     }
     iTk = start;
     return false;
@@ -624,8 +641,9 @@ bool fnDef(){
                         if(fnParam()){
                         }
                         else{
-                          iTk = start;
-                          return false;
+                          tkerr(iTk, "there is a comma but no parameter after");
+                          //iTk = start;
+                          //return false;
                         }
                     }
                 }
@@ -633,9 +651,12 @@ bool fnDef(){
                     if(stmCompound()){
                         return true;
                     }
+                    else tkerr(iTk, "missing function implementation");
                 }
+                else tkerr(iTk, "missing )");
             }
         }
+        else tkerr(iTk, "missing function identifier");
     }
     iTk = start;
     return false;
@@ -655,6 +676,7 @@ bool typeBase(){
         if(consume(ID)){
             return true;
         }
+        else tkerr(iTk, "missing struct identifier");
     }
     iTk = start;
     return false;
@@ -666,6 +688,7 @@ bool arrayDecl(){
         if(consume(RBRACKET)){
             return true;
         }
+        else tkerr(iTk, "missing ]");
     }
     iTk = start;
     return false;
@@ -677,6 +700,7 @@ bool fnParam(){
             if(arrayDecl()){}
             return true;
         }
+        else tkerr(iTk, "missing function parameter type identifier");
     }
     iTk = start;
     return false;
@@ -696,14 +720,19 @@ bool stm(){
                             if(stm()){
                                 return true;
                             }
-                            iTk = start;
-                            return false;
+                            else tkerr(iTk, "missing else branch code block");
+                            //iTk = start;
+                            //return false;
                         }
                         return true;
                     }
+                    else tkerr(iTk, "missing if branch code block");
                 }
+                else tkerr(iTk, "missing )");
             }
+            else tkerr(iTk, "missing if condition");
         }
+        else tkerr(iTk, "missing (");
     }
     iTk=start;
     if(consume(WHILE)){
@@ -713,9 +742,13 @@ bool stm(){
                     if(stm()){
                         return true;
                     }
+                    else tkerr(iTk, "missing while code block");
                 }
+                else tkerr(iTk, "missing )");
             }
+            else tkerr(iTk, "missing while condition");
         }
+        else tkerr(iTk, "missing (");
     }
     iTk=start;
     if(consume(FOR)){
@@ -729,16 +762,22 @@ bool stm(){
                         if(stm()){
                             return true;
                         }
+                        else tkerr(iTk, "missing for code block");
                     }
+                    else tkerr(iTk, "missing )");
                 }
+                else tkerr(iTk, "missing ;");
             }
+            else tkerr(iTk, "missing ;");
         }
+        else tkerr(iTk, "missing (");
     }
     iTk=start;
     if(consume(BREAK)){
         if(consume(SEMICOLON)){
             return true;
         }
+        else tkerr(iTk, "missing ;");
     }
     iTk=start;
     if(consume(RETURN)){
@@ -746,6 +785,7 @@ bool stm(){
         if(consume(SEMICOLON)){
             return true;
         }
+        else tkerr(iTk, "missing ;");
     }
     iTk=start;
     if(expr()){}
@@ -766,6 +806,7 @@ bool stmCompound(){
         if(consume(RACC)){
             return true;
         }
+        else tkerr(iTk, "missing }");
     }
     iTk = start;
     return false;
@@ -785,6 +826,7 @@ bool exprAssign(){
             if(exprAssign()){
                 return true;
             }
+            else tkerr(iTk, "missing right expression term");
         }
     }
     iTk=start;
@@ -800,6 +842,7 @@ bool exprUnary(){
         if(exprUnary()){
             return true;
         }
+        else tkerr(iTk, "missing expresion after unary - or unary !");
     }
     iTk=start;
     if(exprPostfix()){
@@ -814,6 +857,7 @@ bool exprOr(){
         if(exprOrPrim()){
             return true;
         }
+        //else tkerr(iTk, "missing ||");
     }
     iTk = start;
     return false;
@@ -825,7 +869,9 @@ bool exprOrPrim(){
             if(exprOrPrim()){
                 return true;
             }
+            //else tkerr(iTk, "missing ||");
         }
+        else tkerr(iTk, "missing expression after ||");
     }
     iTk = start;
     return true;
@@ -836,6 +882,7 @@ bool exprAnd(){
         if(exprAndPrim()){
             return true;
         }
+        //else tkerr(iTk, "missing &&");
     }
     iTk = start;
     return false;
@@ -847,7 +894,9 @@ bool exprAndPrim(){
             if(exprAndPrim()){
                 return true;
             }
+            //else tkerr(iTk, "missing &&");
         }
+        else tkerr(iTk, "missing expression after &&");
     }
     iTk = start;
     return true;
@@ -858,6 +907,7 @@ bool exprEq(){
         if(exprEqPrim()){
             return true;
         }
+        //else tkerr(iTk, "missing == or !=");
     }
     iTk = start;
     return false;
@@ -869,7 +919,9 @@ bool exprEqPrim(){
             if(exprEqPrim()){
                 return true;
             }
+            //else tkerr(iTk, "missing == or !=");
         }
+        else tkerr(iTk, "missing expression after == or !=");
     }
     iTk = start;
     return true;
@@ -880,6 +932,8 @@ bool exprRel(){
         if(exprRelPrim()){
             return true;
         }
+        //else tkerr(iTk, "missing <, <=, > or >=");
+
     }
     iTk = start;
     return false;
@@ -891,7 +945,9 @@ bool exprRelPrim(){
             if(exprRelPrim()){
                 return true;
             }
+            //else tkerr(iTk, "missing <, <=, > or >=");
         }
+        else tkerr(iTk, "missing expression after <, <=, > or >=");
     }
     iTk = start;
     return true;
@@ -908,12 +964,16 @@ bool exprAdd(){
 }
 bool exprAddPrim(){
     Token *start=iTk;
+    char sym;
+    if(start->code == ADD) {sym='+';}
+        else {sym='-';}
     if(consume(ADD)||consume(SUB)){
         if(exprMul()){
             if(exprAddPrim()){
                 return true;
             }
         }
+        else tkerr(iTk, "missing expression after %c",sym);
     }
     iTk = start;
     return true;
@@ -930,12 +990,16 @@ bool exprMul(){
 }
 bool exprMulPrim(){
     Token *start=iTk;
+    char sym;
+    if(start->code == MUL) {sym='*';}
+        else {sym='/';}
     if(consume(MUL)||consume(DIV)){
         if(exprCast()){
             if(exprMulPrim()){
                 return true;
             }
         }
+        else tkerr(iTk, "missing expression after %c",sym);
     }
     iTk = start;
     return true;
@@ -950,7 +1014,9 @@ bool exprCast(){
                     return true;
                 }
             }
+            else tkerr(iTk, "missing )");
         }
+        //else tkerr(iTk, "missing cast type declaration");
     }
     iTk=start;
     if(exprUnary()){
@@ -978,7 +1044,9 @@ bool exprPostfixPrim(){
                     return true;
                 }
             }
+            else tkerr(iTk, "missing ]");
         }
+        else tkerr(iTk, "missing expression between []");
     }
     iTk=start;
     if(consume(DOT)){
@@ -987,6 +1055,7 @@ bool exprPostfixPrim(){
                 return true;
             }
         }
+        else tkerr(iTk, "missing identifier after .");
     }
     iTk = start;
     return true;
@@ -999,16 +1068,18 @@ bool exprPrimary(){
                 while(consume(COMMA)){
                     if(expr()){}
                     else{
-                        iTk=start;
-                        return false;
+                        tkerr(iTk, "missing expression after ,");
+                        //iTk=start;
+                        //return false;
                     }
                 }
             }
             if(consume(RPAR)){
                 return true;
             }
-            iTk=start;
-            return false;
+            else tkerr(iTk, "missing )");
+            //iTk=start;
+            //return false;
         }
         return true;
     }
@@ -1030,7 +1101,9 @@ bool exprPrimary(){
             if(consume(RPAR)){
                 return true;
             }
+            else tkerr(iTk, "missing )");
         }
+        else tkerr(iTk, "missing expression after (");
     }
     iTk = start;
     return false;
@@ -1057,6 +1130,7 @@ int main()
     iTk = tokens;
     bool start = unit();
     printf("%d\n", start);
-    showAtoms();
+
+    EliberareMemorie();
     return 0;
 }
