@@ -24,6 +24,17 @@ double sum(double x[5],int n){
 	}
 
 void f(struct S1 p){
-	puti(p.i);
+	//puti(p.i);
 	}
+
+void main(){
+	int i;
+	double x;
+	for(i=10;;i=i/2){
+        z=sum(p,5);
+		//puti(i);
+		if(i==0)break;
+        }
+	}
+
 

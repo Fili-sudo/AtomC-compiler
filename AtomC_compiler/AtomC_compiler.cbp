@@ -42,10 +42,15 @@
 		<Unit filename="1.txt" />
 		<Unit filename="2.txt" />
 		<Unit filename="3.txt" />
+		<Unit filename="4.txt" />
 		<Unit filename="ad.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="ad.h" />
+		<Unit filename="at.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="at.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
