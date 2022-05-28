@@ -4,16 +4,19 @@ double z;
 double p[100];
 
 struct S1{
-	int i;
+    char i;
+    int k;
 	double d[2];
 	char x;
 	};
 struct S1 p1;
 struct S1 vp[10];
 
-double sum(double x[5],int n){
+double sum(double x[5],int n, char b){
 	double r;
 	int i;
+	char a;
+	a='A';
 	r=0;
 	for(i=0;i<n;i=i+1){
 		double n;
@@ -22,7 +25,6 @@ double sum(double x[5],int n){
 		}
 	return r;
 	}
-
 void f(struct S1 p){
 	//puti(p.i);
 	}
@@ -30,8 +32,8 @@ void f(struct S1 p){
 void main(){
 	int i;
 	double x;
+	x=sum(p,3,'A');
 	for(i=10;;i=i/2){
-        z=sum(p,5);
 		//puti(i);
 		if(i==0)break;
         }

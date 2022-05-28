@@ -1,4 +1,3 @@
-//#include "main.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,8 +7,10 @@
 
 #define SAFEALLOC(var,Type) if((var=(Type*)malloc(sizeof(Type)))==NULL)err("not enough memory");
 
-Domain *symTable= NULL;
-char *globalMemory= NULL;
+
+
+Domain *symTable=NULL;
+char *globalMemory=NULL;
 int nGlobalMemory=0;
 
 int typeBaseSize(Type *t){
@@ -44,7 +45,7 @@ void freeSymbols(Symbol *list){
 
 Symbol *newSymbol(const char *name,SymKind kind){
 	Symbol *s;
-	SAFEALLOC(s,Symbol)
+	SAFEALLOC(s,Symbol);
 	// seteaza pe 0/NULL toate campurile
 	memset(s,0,sizeof(Symbol));
 	s->name=name;
@@ -54,7 +55,7 @@ Symbol *newSymbol(const char *name,SymKind kind){
 
 Symbol *dupSymbol(Symbol *symbol){
 	Symbol *s;
-	SAFEALLOC(s,Symbol)
+	SAFEALLOC(s,Symbol);
 	*s=*symbol;
 	s->next=NULL;
 	return s;
@@ -194,3 +195,18 @@ int allocInGlobalMemory(int nBytes){
 	return idx;
 	}
 
+Symbol *addExtFn(const char *name,void(*extFnPtr)(),Type ret){
+	Symbol *fn=newSymbol(name,SK_FN);
+	fn->fn.extFnPtr=extFnPtr;
+	fn->type=ret;
+	addSymbolToDomain(symTable,fn);
+	return fn;
+	}
+
+Symbol *addFnParam(Symbol *fn,const char *name,Type type){
+	Symbol *param=newSymbol(name,SK_PARAM);
+	param->type=type;
+	param->paramIdx=symbolsLen(fn->fn.params);
+	addSymbolToList(&fn->fn.params,dupSymbol(param));
+	return param;
+	}

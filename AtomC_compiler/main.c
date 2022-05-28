@@ -1,5 +1,6 @@
 #include "ad.h"
 #include "at.h"
+#include "mv.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1350,11 +1351,14 @@ int main()
         }
     //showAtoms();
     pushDomain();
+    mvInit();
     iTk = tokens;
     bool start = unit();
     printf("%d\n", start);
 
-    showDomain(symTable,"global");
+    //showDomain(symTable,"global");
+    genTestProgram2();
+    run();
     dropDomain();
     EliberareMemorie();
     return 0;
